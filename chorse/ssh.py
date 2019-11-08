@@ -1,6 +1,6 @@
 import paramiko
 
-from chorse.nipa import Config
+from chorse.config import Config
 
 
 def get_ssh(host_ip, port, username, pkey):
@@ -13,6 +13,13 @@ def get_ssh(host_ip, port, username, pkey):
         raise e
 
     return ssh
+
+
+def get_sftp(host_ip, port, username, pkey):
+    ssh = get_ssh(host_ip, port, username, pkey)
+    sftp = ssh.open_sftp()
+
+    return sftp
 
 
 def close_ssh(ssh):
