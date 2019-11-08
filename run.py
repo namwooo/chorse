@@ -2,6 +2,7 @@
 
 import click
 
+from chorse.imaging import imaging_cli
 from chorse.nipa import nipa_cli
 
 
@@ -11,6 +12,7 @@ def main_cli():
 
 
 main_cli.add_command(nipa_cli)
+main_cli.add_command(imaging_cli)
 
 if __name__ == "__main__":
     main_cli()

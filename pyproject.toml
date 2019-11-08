@@ -8,6 +8,7 @@ authors = ["Luca <luca@bluewhale.kr>"]
 python = "^3.7"
 click = "^7.0"
 paramiko = "2.6.0"
+Pillow = "^6.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
