@@ -1,6 +1,6 @@
 import click
 
-from chorse.nipa.export import download
+from chorse.nipa.export import download, face_upload_count
 from chorse.nipa.upload import bimmo_abnormal_csvify, bimmo_face_csvify, copy_file
 
 
@@ -12,4 +12,4 @@ def nipa_cli():
 nipa_cli.add_command(bimmo_abnormal_csvify)
 nipa_cli.add_command(bimmo_face_csvify)
 nipa_cli.add_command(download)
-nipa_cli.add_command(copy_file)
+nipa_cli.add_command(face_upload_count)
