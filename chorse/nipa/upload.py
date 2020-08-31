@@ -4,12 +4,17 @@ from urllib import parse
 
 import click
 
-from chorse.ssh import execute_command_through_ssh
+from chorse.config import Config
+from chorse.ssh import ssh_execute, get_ssh, close_ssh
+
 
 def remove_unmasking_video(resource_path):
     command = f'find {resource_path} -type f ! -iname \*_masking.mp4 -exec rm' + ' {} \;'
 
-    result = execute_command_through_ssh(command)
+    ssh = get_ssh(Config.HOST_IP, port=Config.PORT, username=Config.USERNAME, pkey=Config.PKEY)
+    result = ssh_execute(ssh, command)
+    result = result.read().decode('UTF-8').strip('\n')
+    close_ssh(ssh)
 
     return result
 
@@ -17,7 +22,10 @@ def remove_unmasking_video(resource_path):
 def get_abnormal_urls(resource_path, created_at=None):
     ROOT_URL = 'https://nas-web-01.bluewhale.kr/bimmo/nipa/abnormal/'
     command = f'find {resource_path} \( -iname "*_masking.mp4" -or -iname "*_masking.mov" \) -type f -newerBt {created_at} -exec ls' + ' {} \;'
-    result = execute_command_through_ssh(command)
+    ssh = get_ssh(Config.HOST_IP, port=Config.PORT, username=Config.USERNAME, pkey=Config.PKEY)
+    result = ssh_execute(ssh, command)
+    result = result.read().decode('UTF-8').strip('\n')
+    close_ssh(ssh)
 
     result = result.read().decode('UTF-8').strip('\n')
 
@@ -29,11 +37,15 @@ def get_abnormal_urls(resource_path, created_at=None):
     return urls
 
 
-def get_face_urls(resource_path, created_at=None):
+def get_face_urls(resource_path):
     ROOT_URL = 'https://nas-web-01.bluewhale.kr/bimmo/nipa/face/'
-    command = f'find {resource_path} \( -iname "*.mp4" -or -iname "*.mov" \) -type f -newerBt {created_at} -exec ls' + ' {} \;'
-    result = execute_command_through_ssh(command)
+    command = f'find {resource_path} \( -iname "*.mp4" -or -iname "*.mov" \) -type f -exec ls' + ' {} \;'
+    ssh = get_ssh(Config.HOST_IP, port=Config.PORT, username=Config.USERNAME, pkey=Config.PKEY)
+    result = ssh_execute(ssh, command)
     result = result.read().decode('UTF-8').strip('\n')
+    close_ssh(ssh)
+
+    print(result)
 
     urls = []
     if result:
@@ -108,6 +120,7 @@ def bimmo_face_csvify(resource_path, target_path, quality, resize_width, per_sec
              'meta_info.extract_info.extract_per_frames',
              'meta_info.extract_info.extract_count'])
         for url in urls:
+            print(url)
             parsed_url = parse.urlparse(url)
             encoded_path = parse.quote(parsed_url.path)
             result = parsed_url.scheme + '://' + parsed_url.netloc + encoded_path

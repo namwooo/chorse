@@ -1,7 +1,5 @@
 import paramiko
 
-from chorse.config import Config
-
 
 def get_ssh(host_ip, port, username, pkey):
     try:
@@ -34,11 +32,3 @@ def ssh_execute(ssh, command):
         raise e
 
     return stdout
-
-
-def execute_command_through_ssh(command):
-    ssh = get_ssh(Config.HOST_IP, port=Config.PORT, username=Config.USERNAME, pkey=Config.PKEY)
-    result = ssh_execute(ssh, command)
-    close_ssh(ssh)
-
-    return result

@@ -5,7 +5,8 @@ from urllib import parse, request
 
 import click
 
-from chorse.ssh import execute_command_through_ssh
+from chorse.config import Config
+from chorse.ssh import ssh_execute, get_ssh, close_ssh
 
 
 @click.command('download')
@@ -59,11 +60,13 @@ def face_upload_count(resource_path, target_path):
 def get_face_resources(resource_path):
     ROOT_URL = 'https://nas-web-01.bluewhale.kr/bimmo/nipa/face/'
     command = f'find {resource_path} \( -name "*_2" -or -name "*_1" -or -name "*_1(*" -or -name "*_2(*" \) -type d;'
-    result = execute_command_through_ssh(command)
+    ssh = get_ssh(Config.HOST_IP, port=Config.PORT, username=Config.USERNAME, pkey=Config.PKEY)
+    result = ssh_execute(ssh, command)
     result = result.read().decode('UTF-8').strip('\n')
+    close_ssh(ssh)
 
     urls = []
     if result:
         files = result.split('\n')
-        urls = [file.replace('/volume1/storage/bimmo/nipa/face/', ROOT_URL) for file in files]
+        urls = [file.replace('/volume1/storage/bimmo/nipa/face/', '').replace('(증필)', '').replace('(증명사진필요', '') for file in files]
     return urls
